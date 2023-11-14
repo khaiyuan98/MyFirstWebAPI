@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Test.DataAccess.Models;
 using Test.DataAccess.Services;
 
 namespace Test.WebAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeeController : ControllerBase
@@ -26,87 +28,47 @@ namespace Test.WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Employee>>> Get()
         {
-            try
-            {
-                IEnumerable<Employee> employees = await _employeeService.GetEmployees();
-                return Ok(employees);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"{ex.Message}");
-                return StatusCode(500, "An internal server error occurred.");
-            }
+            IEnumerable<Employee> employees = await _employeeService.GetEmployees();
+            return Ok(employees);
         }
 
         //POST: api/employee
         [HttpPost]
         public async Task<ActionResult<int>> Post(Employee newEmployee)
         {
-            try
-            {
-                int newId = await _employeeService.InsertEmployee(newEmployee);
-                return Ok(newId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"{ex.Message}");
-                return StatusCode(500, "An internal server error occurred.");
-            }
+            int newId = await _employeeService.InsertEmployee(newEmployee);
+            return Ok(newId);
         }
 
         [HttpPut]
         public async Task<ActionResult<int>> Put(Employee employee)
         {
-            try
-            {
-                int res = await _employeeService.UpdateEmployee(employee);
-                return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"{ex.Message}");
-                return StatusCode(500, "An internal server error occurred.");
-            }
+            int res = await _employeeService.UpdateEmployee(employee);
+            return Ok(res);
         }
 
         [HttpDelete("{employeeId}")]
         public async Task<ActionResult<int>> Delete(int employeeId)
         {
-            try
-            {
-                int res = await _employeeService.DeleteEmployee(employeeId);
-                return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"{ex.Message}");
-                return StatusCode(500, "An internal server error occurred.");
-            }
+            int res = await _employeeService.DeleteEmployee(employeeId);
+            return Ok(res);
         }
 
         [Route("SaveFile")]
         [HttpPost]
         public ActionResult<string> SaveFile()
         {
-            try
-            {
-                var  httpRequest = Request.Form;
-                var postedFile = httpRequest.Files[0];
-                string filename = postedFile.FileName;
-                var physicalPath = _env.ContentRootPath + "/Photos/" + filename;
+            var httpRequest = Request.Form;
+            var postedFile = httpRequest.Files[0];
+            string filename = postedFile.FileName;
+            var physicalPath = _env.ContentRootPath + "/Photos/" + filename;
 
-                using (var stream = new FileStream(physicalPath, FileMode.Create))
-                {
-                    postedFile.CopyTo(stream);
-                }
-
-                return Ok(filename);
-            }
-            catch (Exception ex)
+            using (var stream = new FileStream(physicalPath, FileMode.Create))
             {
-                _logger.LogError($"{ex.Message}");
-                return StatusCode(500, "An internal server error occurred.");
+                postedFile.CopyTo(stream);
             }
+
+            return Ok(filename);
         }
     }
 }
