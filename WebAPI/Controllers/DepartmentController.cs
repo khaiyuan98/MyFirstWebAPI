@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using Test.DataAccess.Models;
@@ -6,6 +7,7 @@ using Test.DataAccess.Services;
 
 namespace Test.WebAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DepartmentController : ControllerBase
@@ -25,62 +27,30 @@ namespace Test.WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Department>>> Get()
         {
-            try
-            {
-                IEnumerable<Department> departments = await _departmentService.GetDepartments();
-                return Ok(departments);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"{ex.Message}");
-                return StatusCode(500, "An internal server error occurred.");
-            }
+            IEnumerable<Department> departments = await _departmentService.GetDepartments();
+            return Ok(departments);
         }
 
         //POST: api/department
         [HttpPost]
         public async Task<ActionResult<int>> Post(Department newDepartment)
         {
-            try
-            {
-                int newId = await _departmentService.InsertDepartment(newDepartment);
-                return Ok(newId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"{ex.Message}");
-                return StatusCode(500, "An internal server error occurred.");
-            }
+            int newId = await _departmentService.InsertDepartment(newDepartment);
+            return Ok(newId);
         }
 
         [HttpPut]
         public async Task<ActionResult<int>> Put(Department department)
         {
-            try
-            {
-                int res = await _departmentService.UpdateDepartment(department);
-                return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"{ex.Message}");
-                return StatusCode(500, "An internal server error occurred.");
-            }
+            int res = await _departmentService.UpdateDepartment(department);
+            return Ok(res);
         }
 
         [HttpDelete("{departmentId}")]
         public async Task<ActionResult<int>> Delete(int departmentId)
         {
-            try
-            {
-                int res = await _departmentService.DeleteDepartment(departmentId);
-                return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"{ex.Message}");
-                return StatusCode(500, "An internal server error occurred.");
-            }
+            int res = await _departmentService.DeleteDepartment(departmentId);
+            return Ok(res);
         }
 
     }
