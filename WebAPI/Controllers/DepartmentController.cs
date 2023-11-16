@@ -2,8 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
-using Test.DataAccess.Models;
-using Test.DataAccess.Services;
+using Test.Shared.Models;
+using Test.WebAPI.Models;
+using Test.WebAPI.Services;
 
 namespace Test.WebAPI.Controllers
 {
@@ -14,9 +15,9 @@ namespace Test.WebAPI.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<DepartmentController> _logger;
-        private readonly IDepartmentRepository _departmentService;
+        private readonly IDepartmentService _departmentService;
 
-        public DepartmentController(IConfiguration configuration, ILogger<DepartmentController> logger, IDepartmentRepository departmentService)
+        public DepartmentController(IConfiguration configuration, ILogger<DepartmentController> logger, IDepartmentService departmentService)
         {
             _configuration = configuration;
             _departmentService = departmentService;
@@ -33,7 +34,7 @@ namespace Test.WebAPI.Controllers
 
         //POST: api/department
         [HttpPost]
-        public async Task<ActionResult<int>> Post(Department newDepartment)
+        public async Task<ActionResult<int>> Post(NewDepartmentRequest newDepartment)
         {
             int newId = await _departmentService.InsertDepartment(newDepartment);
             return Ok(newId);
@@ -52,6 +53,5 @@ namespace Test.WebAPI.Controllers
             int res = await _departmentService.DeleteDepartment(departmentId);
             return Ok(res);
         }
-
     }
 }

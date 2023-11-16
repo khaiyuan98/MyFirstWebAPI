@@ -1,6 +1,6 @@
-﻿using Test.DataAccess.Models;
+﻿using Test.Shared.Models;
 
-namespace Test.DataAccess.Services
+namespace Test.DataAccess.Repository
 {
     public interface IEmployeeRepository
     {

@@ -6,15 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Test.DataAccess.Data;
-using Test.DataAccess.Models;
+using Test.Shared.Models;
 
-namespace Test.DataAccess.Services
+namespace Test.DataAccess.Repository
 {
     public class EmployeeRepository : IEmployeeRepository
     {
-        private readonly SqlDataAccess _db;
+        private readonly ISqlDataAccess _db;
 
-        public EmployeeRepository(SqlDataAccess myDb)
+        public EmployeeRepository(ISqlDataAccess myDb)
         {
             _db = myDb;
         }

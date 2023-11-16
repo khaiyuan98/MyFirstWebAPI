@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Test.DataAccess.Models;
-using Test.DataAccess.Services;
+using Test.Shared.Models;
+using Test.WebAPI.Models;
+using Test.WebAPI.Services;
 
 namespace Test.WebAPI.Controllers
 {
@@ -14,14 +15,14 @@ namespace Test.WebAPI.Controllers
         private readonly IConfiguration _configuration;
         private readonly ILogger<DepartmentController> _logger;
         private readonly IWebHostEnvironment _env;
-        private readonly IEmployeeRepository _employeeService;
+        private readonly IEmployeeService _employeeService;
 
-        public EmployeeController(IConfiguration configuration, ILogger<DepartmentController> logger, IWebHostEnvironment env, IEmployeeRepository employeeService)
+        public EmployeeController(IConfiguration configuration, ILogger<DepartmentController> logger, IWebHostEnvironment env, IEmployeeService employeeService)
         {
             _configuration = configuration;
             _employeeService = employeeService;
             _env = env;
-            _logger = logger;
+            _logger = logger; 
         }
 
         // GET: api/employee
@@ -34,7 +35,7 @@ namespace Test.WebAPI.Controllers
 
         //POST: api/employee
         [HttpPost]
-        public async Task<ActionResult<int>> Post(Employee newEmployee)
+        public async Task<ActionResult<int>> Post(NewEmployeeRequest newEmployee)
         {
             int newId = await _employeeService.InsertEmployee(newEmployee);
             return Ok(newId);
@@ -56,18 +57,9 @@ namespace Test.WebAPI.Controllers
 
         [Route("SaveFile")]
         [HttpPost]
-        public ActionResult<string> SaveFile()
+        public ActionResult<string> SaveFile(IFormFile postedFile)
         {
-            var httpRequest = Request.Form;
-            var postedFile = httpRequest.Files[0];
-            string filename = postedFile.FileName;
-            var physicalPath = _env.ContentRootPath + "/Photos/" + filename;
-
-            using (var stream = new FileStream(physicalPath, FileMode.Create))
-            {
-                postedFile.CopyTo(stream);
-            }
-
+            string filename = _employeeService.SaveFile(postedFile, _env);
             return Ok(filename);
         }
     }

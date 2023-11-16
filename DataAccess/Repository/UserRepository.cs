@@ -6,15 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Test.DataAccess.Data;
-using Test.DataAccess.Models;
+using Test.Shared.Models;
 
 namespace Test.DataAccess.Repository
 {
     public class UserRepository : IUserRepository
     {
-        private readonly SqlDataAccess _db;
+        private readonly ISqlDataAccess _db;
 
-        public UserRepository(SqlDataAccess myDb)
+        public UserRepository(ISqlDataAccess myDb)
         {
             _db = myDb;
         }

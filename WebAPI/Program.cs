@@ -7,8 +7,8 @@ using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using Test.DataAccess.Data;
 using Test.DataAccess.Repository;
-using Test.DataAccess.Services;
 using Test.WebAPI.Middleware;
+using Test.WebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,10 +61,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddAuthorization();
 
 // Add DB Services
-builder.Services.AddSingleton<SqlDataAccess>();
-builder.Services.AddSingleton<IDepartmentRepository, DepartmentRepository>();
-builder.Services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ISqlDataAccess, SqlDataAccess>();
+builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

@@ -1,4 +1,4 @@
-﻿using Test.DataAccess.Models;
+﻿using Test.Shared.Models;
 
 namespace Test.DataAccess.Repository
 {

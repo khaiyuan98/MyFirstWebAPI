@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Test.DataAccess.Models
+namespace Test.Shared.Models
 {
     public class User
     {
