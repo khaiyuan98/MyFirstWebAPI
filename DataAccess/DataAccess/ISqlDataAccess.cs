@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace Test.DataAccess.Data
+namespace Test.DataAccess.DataAccess
 {
     public interface ISqlDataAccess
     {

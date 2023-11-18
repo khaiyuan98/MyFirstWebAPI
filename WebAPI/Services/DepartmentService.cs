@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Test.DataAccess.Models;
 using Test.DataAccess.Repository;
-using Test.Shared.Models;
-using Test.WebAPI.Controllers;
-using Test.WebAPI.Models;
+using Test.WebAPI.Models.Department;
 
 namespace Test.WebAPI.Services
 {
@@ -11,11 +9,13 @@ namespace Test.WebAPI.Services
     {
         private readonly ILogger<DepartmentService> _logger;
         private readonly IDepartmentRepository _departmentRepository;
+        private readonly IMapper _mapper;
 
-        public DepartmentService(ILogger<DepartmentService> logger, IDepartmentRepository departmentService)
+        public DepartmentService(ILogger<DepartmentService> logger, IDepartmentRepository departmentService, IMapper mapper)
         {
             _departmentRepository = departmentService;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<Department>> GetDepartments()
@@ -24,13 +24,9 @@ namespace Test.WebAPI.Services
             return departments;
         }
 
-        public async Task<int> InsertDepartment(NewDepartmentRequest newDepartment)
+        public async Task<int> InsertDepartment(NewDepartmentDto newDepartment)
         {
-            Department department = new Department
-            {
-                DepartmentName = newDepartment.DepartmentName
-            };
-
+            Department department = _mapper.Map<Department>(newDepartment);
             int newId = await _departmentRepository.InsertDepartment(department);
             return newId;
         }

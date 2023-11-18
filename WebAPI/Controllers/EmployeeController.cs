@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Test.Shared.Models;
-using Test.WebAPI.Models;
+using Test.DataAccess.Models;
+using Test.WebAPI.Models.Employee;
 using Test.WebAPI.Services;
 
 namespace Test.WebAPI.Controllers
@@ -35,7 +34,7 @@ namespace Test.WebAPI.Controllers
 
         //POST: api/employee
         [HttpPost]
-        public async Task<ActionResult<int>> Post(NewEmployeeRequest newEmployee)
+        public async Task<ActionResult<int>> Post(NewEmployeeDto newEmployee)
         {
             int newId = await _employeeService.InsertEmployee(newEmployee);
             return Ok(newId);

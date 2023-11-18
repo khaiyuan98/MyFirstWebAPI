@@ -1,5 +1,5 @@
-﻿using Test.Shared.Models;
-using Test.WebAPI.Models;
+﻿using Test.DataAccess.Models;
+using Test.WebAPI.Models.Employee;
 
 namespace Test.WebAPI.Services
 {
@@ -7,7 +7,7 @@ namespace Test.WebAPI.Services
     {
         Task<int> DeleteEmployee(int employeeId);
         Task<IEnumerable<Employee>> GetEmployees();
-        Task<int> InsertEmployee(NewEmployeeRequest newEmployee);
+        Task<int> InsertEmployee(NewEmployeeDto newEmployee);
         string SaveFile(IFormFile postedFile, IWebHostEnvironment env);
         Task<int> UpdateEmployee(Employee employee);
     }

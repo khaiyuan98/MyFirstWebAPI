@@ -1,12 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using Test.DataAccess.Repository;
-using Test.WebAPI.Models;
+using Test.WebAPI.Models.User;
 using Test.WebAPI.Services;
 
 namespace Test.WebAPI.Controllers
@@ -28,7 +22,7 @@ namespace Test.WebAPI.Controllers
         [Authorize]
         [Route("register")]
         [HttpPost]
-        public async Task<ActionResult<int>> Register(NewUserRequest request)
+        public async Task<ActionResult<int>> Register(NewUserDto request)
         {
             int res = await _userService.RegisterAsync(request);
             return Ok(res);
@@ -37,16 +31,10 @@ namespace Test.WebAPI.Controllers
         [AllowAnonymous]
         [Route("login")]
         [HttpPost]
-        public async Task<ActionResult<string>> LoginAsync(UserLoginRequest request) 
+        public async Task<ActionResult<string>> LoginAsync(UserLoginDto request) 
         {
             string? token = await _userService.LoginAsync(request);
-
-            if (token == null)
-            {
-                return Unauthorized("Invalid username or password.");
-            }
-
-            return Ok(token);
+            return token is not null ? Ok(token) : Unauthorized("Invalid username or password.");
         }
     }
 }

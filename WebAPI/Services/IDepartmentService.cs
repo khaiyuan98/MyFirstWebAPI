@@ -1,5 +1,5 @@
-﻿using Test.Shared.Models;
-using Test.WebAPI.Models;
+﻿using Test.DataAccess.Models;
+using Test.WebAPI.Models.Department;
 
 namespace Test.WebAPI.Services
 {
@@ -7,7 +7,7 @@ namespace Test.WebAPI.Services
     {
         Task<int> DeleteDepartment(int departmentId);
         Task<IEnumerable<Department>> GetDepartments();
-        Task<int> InsertDepartment(NewDepartmentRequest newDepartment);
+        Task<int> InsertDepartment(NewDepartmentDto newDepartment);
         Task<int> UpdateDepartment(Department department);
     }
 }

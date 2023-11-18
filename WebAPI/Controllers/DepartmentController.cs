@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
-using Test.Shared.Models;
-using Test.WebAPI.Models;
+using Test.DataAccess.Models;
+using Test.WebAPI.Models.Department;
 using Test.WebAPI.Services;
 
 namespace Test.WebAPI.Controllers
@@ -34,7 +32,7 @@ namespace Test.WebAPI.Controllers
 
         //POST: api/department
         [HttpPost]
-        public async Task<ActionResult<int>> Post(NewDepartmentRequest newDepartment)
+        public async Task<ActionResult<int>> Post(NewDepartmentDto newDepartment)
         {
             int newId = await _departmentService.InsertDepartment(newDepartment);
             return Ok(newId);

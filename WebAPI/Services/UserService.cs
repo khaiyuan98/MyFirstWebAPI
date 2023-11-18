@@ -1,10 +1,11 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using Test.DataAccess.Models;
 using Test.DataAccess.Repository;
-using Test.Shared.Models;
-using Test.WebAPI.Models;
+using Test.WebAPI.Models.User;
 
 namespace Test.WebAPI.Services
 {
@@ -13,21 +14,23 @@ namespace Test.WebAPI.Services
         private readonly IConfiguration _configuration;
         private readonly ILogger<UserService> _logger;
         private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        public UserService(IConfiguration configuration, ILogger<UserService> logger, IUserRepository userService)
+        public UserService(IConfiguration configuration, ILogger<UserService> logger, IUserRepository userService, IMapper mapper)
         {
             _configuration = configuration;
             _logger = logger;
             _userRepository = userService;
+            _mapper = mapper;
         }
 
-        public async Task<int> RegisterAsync(NewUserRequest request)
+        public async Task<int> RegisterAsync(NewUserDto newUser)
         {
-            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            CreatePasswordHash(newUser.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
             User user = new User
             {
-                Username = request.Username,
+                Username = newUser.Username,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
             };
@@ -36,11 +39,11 @@ namespace Test.WebAPI.Services
             return res;
         }
 
-        public async Task<string?> LoginAsync(UserLoginRequest request)
+        public async Task<string?> LoginAsync(UserLoginDto userLogin)
         {
-            User? user = await _userRepository.GetUserByUsername(request.Username);
+            User? user = await _userRepository.GetUserByUsername(userLogin.Username);
 
-            if (user?.Username != request.Username || !VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            if (user?.Username != userLogin.Username || !VerifyPasswordHash(userLogin.Password, user.PasswordHash, user.PasswordSalt))
             {
                 return null;
             }

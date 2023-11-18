@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -5,8 +6,9 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
-using Test.DataAccess.Data;
+using Test.DataAccess.DataAccess;
 using Test.DataAccess.Repository;
+using Test.WebAPI;
 using Test.WebAPI.Middleware;
 using Test.WebAPI.Services;
 
@@ -28,6 +30,14 @@ builder.Services.AddSwaggerGen(options =>
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
+
+// Auto Mapper Configurations
+var mapperConfig = new MapperConfiguration(mc =>
+{
+    mc.AddProfile(new AutoMapperProfile());
+});
+IMapper mapper = mapperConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
 
 // Enable CORS
 builder.Services.AddCors(c => 

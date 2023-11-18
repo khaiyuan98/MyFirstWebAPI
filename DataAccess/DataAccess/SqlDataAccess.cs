@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 
-namespace Test.DataAccess.Data
+namespace Test.DataAccess.DataAccess
 {
     public class SqlDataAccess : ISqlDataAccess
     {

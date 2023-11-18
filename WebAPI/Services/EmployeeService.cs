@@ -1,7 +1,7 @@
-﻿using Test.DataAccess.Repository;
-using Test.Shared.Models;
-using Test.WebAPI.Controllers;
-using Test.WebAPI.Models;
+﻿using AutoMapper;
+using Test.DataAccess.Models;
+using Test.DataAccess.Repository;
+using Test.WebAPI.Models.Employee;
 
 namespace Test.WebAPI.Services
 {
@@ -9,11 +9,13 @@ namespace Test.WebAPI.Services
     {
         private readonly ILogger<EmployeeService> _logger;
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IMapper _mapper;
 
-        public EmployeeService(ILogger<EmployeeService> logger, IEmployeeRepository employeeRepository)
+        public EmployeeService(ILogger<EmployeeService> logger, IEmployeeRepository employeeRepository, IMapper mapper)
         {
             _logger = logger;
             _employeeRepository = employeeRepository;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<Employee>> GetEmployees()
@@ -21,16 +23,9 @@ namespace Test.WebAPI.Services
             return await _employeeRepository.GetEmployees();
         }
 
-        public async Task<int> InsertEmployee(NewEmployeeRequest newEmployee)
+        public async Task<int> InsertEmployee(NewEmployeeDto newEmployee)
         {
-            Employee employee = new Employee
-            {
-                EmployeeName = newEmployee.EmployeeName,
-                Department = newEmployee.Department,
-                DateOfJoining = newEmployee.DateOfJoining,
-                PhotoFileName = newEmployee.PhotoFileName
-            };
-
+            Employee employee = _mapper.Map<Employee>(newEmployee);
             return await _employeeRepository.InsertEmployee(employee);
         }
 

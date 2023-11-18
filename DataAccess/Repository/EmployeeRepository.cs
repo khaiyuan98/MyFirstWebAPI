@@ -1,12 +1,7 @@
 ﻿using Dapper;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Test.DataAccess.Data;
-using Test.Shared.Models;
+using Test.DataAccess.DataAccess;
+using Test.DataAccess.Models;
 
 namespace Test.DataAccess.Repository
 {
