@@ -13,6 +13,7 @@ namespace Test.WebAPI
             CreateMap<NewDepartmentDto, Department>().ReverseMap();
             CreateMap<NewEmployeeDto, Employee>().ReverseMap();
             CreateMap<NewUserDto, User>().ReverseMap();
+            CreateMap<CurrentUserDto, User>().ReverseMap();
 
             //CreateMap<ContactRequestModel, ContactModel>()
             //    .ForPath(dest => dest.Company.id, o => o.MapFrom(c => c.company_id))

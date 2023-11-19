@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using Test.DataAccess.Models;
 using Test.DataAccess.Repository;
@@ -11,16 +8,14 @@ namespace Test.WebAPI.Services
 {
     public class UserService : IUserService
     {
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<UserService> _logger;
+        private readonly ILogger<EmployeeService> _logger;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        public UserService(IConfiguration configuration, ILogger<UserService> logger, IUserRepository userService, IMapper mapper)
+        public UserService(ILogger<EmployeeService> logger, IUserRepository userRepository, IMapper mapper)
         {
-            _configuration = configuration;
             _logger = logger;
-            _userRepository = userService;
+            _userRepository = userRepository;
             _mapper = mapper;
         }
 
@@ -39,38 +34,6 @@ namespace Test.WebAPI.Services
             return res;
         }
 
-        public async Task<string?> LoginAsync(UserLoginDto userLogin)
-        {
-            User? user = await _userRepository.GetUserByUsername(userLogin.Username);
-
-            if (user?.Username != userLogin.Username || !VerifyPasswordHash(userLogin.Password, user.PasswordHash, user.PasswordSalt))
-            {
-                return null;
-            }
-
-            string token = CreateToken(user);
-            return token;
-        }
-
-        private string CreateToken(User user)
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
-            };
-
-            SymmetricSecurityKey key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            SigningCredentials cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-            JwtSecurityToken token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: cred);
-
-            string? jwt = new JwtSecurityTokenHandler().WriteToken(token);
-            return jwt;
-        }
-
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512())
@@ -80,13 +43,5 @@ namespace Test.WebAPI.Services
             }
         }
 
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512(passwordSalt))
-            {
-                byte[]? computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(passwordHash);
-            }
-        }
     }
 }

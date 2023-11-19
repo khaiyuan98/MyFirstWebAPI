@@ -22,6 +22,14 @@ namespace Test.DataAccess.Repository
             return (await connection.QueryAsync<User>(query, new { Username = username })).FirstOrDefault();
         }
 
+        public async Task<User?> GetUserById(int id)
+        {
+            string query = @"SELECT UserId, Username, PasswordHash, PasswordSalt FROM dbo.Users WHERE UserId = @UserId;";
+
+            using IDbConnection connection = _db.OpenConnection();
+            return (await connection.QueryAsync<User>(query, new { UserId = id })).FirstOrDefault();
+        }
+
         public async Task<int> AddUser(User user)
         {
             string query = @"INSERT INTO dbo.Users(Username, PasswordHash, PasswordSalt) 

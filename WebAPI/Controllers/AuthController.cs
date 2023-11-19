@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Test.DataAccess.Models;
+using Test.WebAPI.Models.Auth;
 using Test.WebAPI.Models.User;
 using Test.WebAPI.Services;
 
@@ -11,30 +14,33 @@ namespace Test.WebAPI.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<AuthController> _logger;
-        private readonly IUserService _userService;
-        public AuthController(IConfiguration configuration, ILogger<AuthController> logger, IUserService userService)
+        private readonly IAuthService _authService;
+        private readonly IMapper _mapper;
+        public AuthController(IConfiguration configuration, ILogger<AuthController> logger, IAuthService authService, IMapper mapper)
         {
             _configuration = configuration;
             _logger = logger;
-            _userService = userService;
-        }
-
-        [Authorize]
-        [Route("register")]
-        [HttpPost]
-        public async Task<ActionResult<int>> Register(NewUserDto request)
-        {
-            int res = await _userService.RegisterAsync(request);
-            return Ok(res);
+            _authService = authService;
+            _mapper = mapper;
         }
 
         [AllowAnonymous]
         [Route("login")]
         [HttpPost]
-        public async Task<ActionResult<string>> LoginAsync(UserLoginDto request) 
+        public async Task<ActionResult<string>> Login(UserLoginDto request) 
         {
-            string? token = await _userService.LoginAsync(request);
+            string? token = await _authService.LoginAsync(request);
             return token is not null ? Ok(token) : Unauthorized("Invalid username or password.");
+        }
+
+        [Authorize]
+        [Route("user")]
+        [HttpGet]
+        public async Task<ActionResult<CurrentUserDto>> GetCurrentUser()
+        {
+            User? user = await _authService.GetCurrentUserAsync();
+            CurrentUserDto currentUser = _mapper.Map<CurrentUserDto>(user);
+            return user is not null ? Ok(currentUser) : NotFound(currentUser);
         }
     }
 }
