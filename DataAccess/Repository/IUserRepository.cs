@@ -6,6 +6,9 @@ namespace Test.DataAccess.Repository
     {
         Task<int> AddUser(User user);
         Task<User?> GetUserById(int id);
+        Task<User?> GetUserByRefreshToken(string refreshToken);
         Task<User?> GetUserByUsername(string username);
+        Task<int> LoginUser(int UserId, string newRefreshToken, DateTime newLoginDate, DateTime newLoginExpires);
+        Task<int> LogoutUser(int UserId);
     }
 }

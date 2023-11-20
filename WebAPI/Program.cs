@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -42,7 +43,11 @@ builder.Services.AddSingleton(mapper);
 // Enable CORS
 builder.Services.AddCors(c => 
 {
-    c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+    c.AddPolicy("AllowOrigin", options => options
+    .WithOrigins(builder.Configuration.GetSection("CorsPolicy:AllowedOrigins").Get<string[]>() ?? new string[] { })
+    .WithMethods(builder.Configuration.GetSection("CorsPolicy:AllowedMethods").Get<string[]>() ?? new string[] { })
+    .WithHeaders(builder.Configuration.GetSection("CorsPolicy:AllowedHeaders").Get<string[]>() ?? new string[] { })
+    .AllowCredentials());
 });
 
 // Json Serializer
@@ -94,7 +99,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // Enable CORS
-app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+app.UseCors("AllowOrigin");
 
 app.UseHttpsRedirection();
 

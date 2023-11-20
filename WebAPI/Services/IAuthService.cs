@@ -7,5 +7,7 @@ namespace Test.WebAPI.Services
     {
         Task<User?> GetCurrentUserAsync();
         Task<string?> LoginAsync(UserLoginDto userLogin);
+        Task LogoutAsync();
+        Task<string?> RefreshToken();
     }
 }

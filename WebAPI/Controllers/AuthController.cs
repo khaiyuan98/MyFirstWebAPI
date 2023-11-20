@@ -33,6 +33,29 @@ namespace Test.WebAPI.Controllers
             return token is not null ? Ok(token) : Unauthorized("Invalid username or password.");
         }
 
+        [AllowAnonymous]
+        [Route("refresh")]
+        [HttpPost]
+        public async Task<ActionResult<string>> RefreshToken()
+        {
+            string? newToken = await _authService.RefreshToken();
+            if (newToken is null)
+            {
+                Unauthorized("Invalid refresh token");
+            }
+
+            return Ok(newToken);
+        }
+
+        [AllowAnonymous]
+        [Route("logout")]
+        [HttpPost]
+        public async Task<ActionResult<string>> Logout()
+        {
+            await _authService.LogoutAsync();
+            return Ok();
+        }
+
         [Authorize]
         [Route("user")]
         [HttpGet]

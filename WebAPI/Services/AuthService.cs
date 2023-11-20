@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -30,37 +31,56 @@ namespace Test.WebAPI.Services
         {
             User? user = await _userRepository.GetUserByUsername(userLogin.Username);
 
-            if (user?.Username != userLogin.Username || !VerifyPasswordHash(userLogin.Password, user.PasswordHash, user.PasswordSalt))
+            if (user is null || user?.Username != userLogin.Username || !VerifyPasswordHash(userLogin.Password, user.PasswordHash, user.PasswordSalt))
             {
                 return null;
             }
 
             string token = CreateToken(user);
+            RefreshToken newRefreshToken = GenerateRefreshToken();
+            SetRefreshToken(newRefreshToken);
+
+            await _userRepository.LoginUser(user.UserId, newRefreshToken.Token, newRefreshToken.CreatedDate, newRefreshToken.Expires);
+
             return token;
         }
 
-        public async Task<string?> LogoutAsync(UserLoginDto userLogin)
+        public async Task LogoutAsync()
         {
-            User? user = await _userRepository.GetUserByUsername(userLogin.Username);
+            _httpContextAccessor.HttpContext?.Response.Cookies.Delete("refreshToken");
+            var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
 
-            if (user?.Username != userLogin.Username || !VerifyPasswordHash(userLogin.Password, user.PasswordHash, user.PasswordSalt))
-            {
-                return null;
-            }
+            if (userIdClaim is not null)
+                await _userRepository.LogoutUser(int.Parse(userIdClaim.Value));
 
-            string token = CreateToken(user);
-            return token;
+            return;
         }
 
         public async Task<User?> GetCurrentUserAsync()
         {
-            var userIdClaim = _httpContextAccessor?.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
 
             if (userIdClaim is null)
                 return null;
 
             User? user = await _userRepository.GetUserById(int.Parse(userIdClaim.Value));
             return user;
+        }
+
+        public async Task<string?> RefreshToken()
+        {
+            string? refreshToken = _httpContextAccessor.HttpContext?.Request.Cookies["refreshToken"];
+
+            if (refreshToken is null)
+                return null;
+
+            User? user = await _userRepository.GetUserByRefreshToken(refreshToken);
+
+            if (user is null)
+                return null;
+
+            string token = CreateToken(user);
+            return token;
         }
 
         private string CreateToken(User user)
@@ -89,6 +109,29 @@ namespace Test.WebAPI.Services
                 byte[]? computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computedHash.SequenceEqual(passwordHash);
             }
+        }
+
+        private RefreshToken GenerateRefreshToken()
+        {
+            RefreshToken refreshToken = new RefreshToken
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                CreatedDate = DateTime.Now,
+                Expires = DateTime.Now.AddDays(7),
+            };
+
+            return refreshToken;
+        }
+
+        private void SetRefreshToken(RefreshToken refreshToken)
+        {
+            CookieOptions cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = refreshToken.Expires,
+            };
+
+            _httpContextAccessor.HttpContext?.Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
         }
     }
 }
