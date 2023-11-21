@@ -67,7 +67,7 @@ namespace Test.DataAccess.Repository
 
         public async Task<int> LogoutUser(int UserId)
         {
-            string query = @"UPDATE dbo.Users SET RefreshToken = NULL, RefreshTokenExpires = GETDATE(), WHERE UserId = @UserId;";
+            string query = @"UPDATE dbo.Users SET RefreshToken = NULL, RefreshTokenExpires = GETDATE() WHERE UserId = @UserId;";
 
             using IDbConnection connection = _db.OpenConnection();
             int res = await connection.ExecuteAsync(query, new { UserId = UserId });

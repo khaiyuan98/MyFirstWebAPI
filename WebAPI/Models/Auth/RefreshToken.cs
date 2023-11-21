@@ -3,7 +3,7 @@
     public class RefreshToken
     {
         public string Token { get; set; } = String.Empty;
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public DateTime Expires { get; set; }
     }
 }

@@ -62,12 +62,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters()
     {
-        ValidateIssuer = bool.Parse(builder.Configuration["Jwt:ValidateIssuer"]?? "true"),
+        ValidateIssuer = bool.Parse(builder.Configuration["Jwt:ValidateIssuer"] ?? "true"),
         ValidateAudience = bool.Parse(builder.Configuration["Jwt:ValidateAudience"] ?? "true"),
         ValidAudience = builder.Configuration["Jwt:Audience"],
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidateIssuerSigningKey = bool.Parse(builder.Configuration["Jwt:ValidateIssuerSigningKey"] ?? "true"),
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "")),
+        ValidateLifetime = true,
         ClockSkew = TimeSpan.FromMinutes(5)
     };
 });
@@ -89,6 +90,9 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+var timeZoneInfo = TimeZoneInfo.Utc;
+builder.Services.AddSingleton(timeZoneInfo);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -107,7 +111,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 // Use the Exception Middleware
 if (app.Environment.IsDevelopment())

@@ -95,7 +95,7 @@ namespace Test.WebAPI.Services
             SigningCredentials cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             JwtSecurityToken token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(int.Parse(_configuration["Jwt:Expires"] ?? "5")),
+                expires: DateTime.UtcNow.AddMinutes(double.Parse(_configuration["Jwt:Expires"] ?? "5")),
                 signingCredentials: cred);
 
             string? jwt = new JwtSecurityTokenHandler().WriteToken(token);
@@ -116,8 +116,8 @@ namespace Test.WebAPI.Services
             RefreshToken refreshToken = new RefreshToken
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                CreatedDate = DateTime.Now,
-                Expires = DateTime.Now.AddDays(7),
+                CreatedDate = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddDays(7),
             };
 
             return refreshToken;
