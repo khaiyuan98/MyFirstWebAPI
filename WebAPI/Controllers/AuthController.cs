@@ -27,24 +27,24 @@ namespace Test.WebAPI.Controllers
         [AllowAnonymous]
         [Route("login")]
         [HttpPost]
-        public async Task<ActionResult<string>> Login(UserLoginDto request) 
+        public async Task<ActionResult<AuthUser>> Login(UserLoginDto request) 
         {
-            string? token = await _authService.LoginAsync(request);
-            return token is not null ? Ok(token) : Unauthorized("Invalid username or password.");
+            AuthUser? authUser = await _authService.LoginAsync(request);
+            return authUser is not null ? Ok(authUser) : Unauthorized("Invalid username or password.");
         }
 
         [AllowAnonymous]
         [Route("refresh")]
         [HttpPost]
-        public async Task<ActionResult<string>> RefreshToken()
+        public async Task<ActionResult<AuthUser>> RefreshToken()
         {
-            string? newToken = await _authService.RefreshToken();
-            if (newToken is null)
+            AuthUser? authUser = await _authService.RefreshToken();
+            if (authUser is null)
             {
-                Unauthorized("Invalid refresh token");
+                return Forbid("Invalid refresh token");
             }
 
-            return Ok(newToken);
+            return Ok(authUser);
         }
 
         [AllowAnonymous]

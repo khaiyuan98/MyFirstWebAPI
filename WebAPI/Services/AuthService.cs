@@ -27,7 +27,7 @@ namespace Test.WebAPI.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<string?> LoginAsync(UserLoginDto userLogin)
+        public async Task<AuthUser?> LoginAsync(UserLoginDto userLogin)
         {
             User? user = await _userRepository.GetUserByUsername(userLogin.Username);
 
@@ -42,7 +42,9 @@ namespace Test.WebAPI.Services
 
             await _userRepository.LoginUser(user.UserId, newRefreshToken.Token, newRefreshToken.CreatedDate, newRefreshToken.Expires);
 
-            return token;
+            AuthUser authUser = _mapper.Map<AuthUser>(user);
+            authUser.AccessToken = token;
+            return authUser;
         }
 
         public async Task LogoutAsync()
@@ -67,7 +69,7 @@ namespace Test.WebAPI.Services
             return user;
         }
 
-        public async Task<string?> RefreshToken()
+        public async Task<AuthUser?> RefreshToken()
         {
             string? refreshToken = _httpContextAccessor.HttpContext?.Request.Cookies["refreshToken"];
 
@@ -79,8 +81,11 @@ namespace Test.WebAPI.Services
             if (user is null)
                 return null;
 
+            AuthUser authUser = _mapper.Map<AuthUser>(user);
             string token = CreateToken(user);
-            return token;
+            authUser.AccessToken = token;
+
+            return authUser;
         }
 
         private string CreateToken(User user)
@@ -117,7 +122,7 @@ namespace Test.WebAPI.Services
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
                 CreatedDate = DateTime.UtcNow,
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["Jwt:RefreshExpires"] ?? "720")),
             };
 
             return refreshToken;

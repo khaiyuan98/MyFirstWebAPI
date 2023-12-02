@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Test.DataAccess.Models;
+using Test.WebAPI.Models.Auth;
 using Test.WebAPI.Models.Department;
 using Test.WebAPI.Models.Employee;
 using Test.WebAPI.Models.User;
@@ -14,6 +15,7 @@ namespace Test.WebAPI
             CreateMap<NewEmployeeDto, Employee>().ReverseMap();
             CreateMap<NewUserDto, User>().ReverseMap();
             CreateMap<CurrentUserDto, User>().ReverseMap();
+            CreateMap<AuthUser, User>().ReverseMap();
 
             //CreateMap<ContactRequestModel, ContactModel>()
             //    .ForPath(dest => dest.Company.id, o => o.MapFrom(c => c.company_id))

@@ -6,8 +6,8 @@ namespace Test.WebAPI.Services
     public interface IAuthService
     {
         Task<User?> GetCurrentUserAsync();
-        Task<string?> LoginAsync(UserLoginDto userLogin);
+        Task<AuthUser?> LoginAsync(UserLoginDto userLogin);
         Task LogoutAsync();
-        Task<string?> RefreshToken();
+        Task<AuthUser?> RefreshToken();
     }
 }
