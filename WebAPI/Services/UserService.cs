@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using System;
 using System.Security.Cryptography;
 using Test.DataAccess.Models;
 using Test.DataAccess.Repository;
@@ -32,6 +33,13 @@ namespace Test.WebAPI.Services
 
             int res = await _userRepository.AddUser(user);
             return res;
+        }
+
+        public async Task<IEnumerable<UserDto>> GetUsers() 
+        {
+            IEnumerable<User> users = await _userRepository.GetUsers();
+            IEnumerable<UserDto> mappedUsers =  _mapper.Map<IEnumerable<User>, IEnumerable<UserDto>>(users);
+            return mappedUsers;
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

@@ -16,6 +16,7 @@ namespace Test.WebAPI
             CreateMap<NewUserDto, User>().ReverseMap();
             CreateMap<CurrentUserDto, User>().ReverseMap();
             CreateMap<AuthUser, User>().ReverseMap();
+            CreateMap<UserDto, User>().ReverseMap();
 
             //CreateMap<ContactRequestModel, ContactModel>()
             //    .ForPath(dest => dest.Company.id, o => o.MapFrom(c => c.company_id))

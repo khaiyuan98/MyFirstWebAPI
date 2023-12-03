@@ -6,6 +6,7 @@ using Test.WebAPI.Services;
 
 namespace Test.WebAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -20,13 +21,21 @@ namespace Test.WebAPI.Controllers
             _userService = userService;
         }
 
-        [Authorize]
-        [Route("register")]
         [HttpPost]
+        [Route("register")]
         public async Task<ActionResult<int>> Register(NewUserDto request)
         {
             int res = await _userService.RegisterAsync(request);
             return Ok(res);
         }
+
+        // GET: api/user
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserDto>>> Get()
+        {
+            IEnumerable<UserDto> users = await _userService.GetUsers();
+            return Ok(users);
+        }
+
     }
 }

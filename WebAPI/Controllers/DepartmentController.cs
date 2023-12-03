@@ -6,6 +6,7 @@ using Test.WebAPI.Services;
 
 namespace Test.WebAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DepartmentController : ControllerBase

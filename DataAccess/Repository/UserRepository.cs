@@ -14,9 +14,17 @@ namespace Test.DataAccess.Repository
             _db = myDb;
         }
 
+        public async Task<IEnumerable<User>> GetUsers()
+        {
+            string query = @"SELECT * FROM dbo.Users;";
+
+            using IDbConnection connection = _db.OpenConnection();
+            return await connection.QueryAsync<User>(query);
+        }
+
         public async Task<User?> GetUserByUsername(string username)
         {
-            string query = @"SELECT UserId, Username, PasswordHash, PasswordSalt FROM dbo.Users WHERE Username = @Username;";
+            string query = @"SELECT * FROM dbo.Users WHERE Username = @Username;";
 
             using IDbConnection connection = _db.OpenConnection();
             return (await connection.QueryAsync<User>(query, new { Username = username })).FirstOrDefault();
@@ -24,7 +32,7 @@ namespace Test.DataAccess.Repository
 
         public async Task<User?> GetUserById(int id)
         {
-            string query = @"SELECT UserId, Username, PasswordHash, PasswordSalt, RefreshToken, LastLoginDate FROM dbo.Users WHERE UserId = @UserId;";
+            string query = @"SELECT * FROM dbo.Users WHERE UserId = @UserId;";
 
             using IDbConnection connection = _db.OpenConnection();
             return (await connection.QueryAsync<User>(query, new { UserId = id })).FirstOrDefault();
@@ -58,7 +66,7 @@ namespace Test.DataAccess.Repository
 
         public async Task<User?> GetUserByRefreshToken(string refreshToken)
         {
-            string query = @"SELECT UserId, Username, PasswordHash, PasswordSalt, RefreshToken, LastLoginDate FROM dbo.Users 
+            string query = @"SELECT * FROM dbo.Users 
                              WHERE RefreshToken = @RefreshToken AND RefreshTokenExpires > GETDATE();";
 
             using IDbConnection connection = _db.OpenConnection();
