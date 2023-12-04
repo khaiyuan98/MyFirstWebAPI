@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using System;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using Test.DataAccess.Models;
 using Test.DataAccess.Repository;
@@ -12,24 +13,29 @@ namespace Test.WebAPI.Services
         private readonly ILogger<EmployeeService> _logger;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(ILogger<EmployeeService> logger, IUserRepository userRepository, IMapper mapper)
+        public UserService(ILogger<EmployeeService> logger, IUserRepository userRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _userRepository = userRepository;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<int> RegisterAsync(NewUserDto newUser)
+        public async Task<int?> RegisterAsync(NewUserDto newUser)
         {
             CreatePasswordHash(newUser.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            User user = new User
-            {
-                Username = newUser.Username,
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt,
-            };
+            var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+                return null;
+
+            User user = _mapper.Map<User>(newUser);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.LastUpdatedBy = int.Parse(userIdClaim.Value);
 
             int res = await _userRepository.AddUser(user);
             return res;

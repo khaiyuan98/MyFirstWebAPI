@@ -40,8 +40,8 @@ namespace Test.DataAccess.Repository
 
         public async Task<int> AddUser(User user)
         {
-            string query = @"INSERT INTO dbo.Users(Username, PasswordHash, PasswordSalt) 
-                            VALUES(@Username, @PasswordHash, @PasswordSalt);
+            string query = @"INSERT INTO dbo.Users(Username, FirstName, LastName, RoleId, PasswordHash, PasswordSalt, LastUpdatedBy) 
+                            VALUES(@Username, @FirstName, @LastName, @PasswordHash, @PasswordSalt, @LastUpdatedBy);
                             SELECT @user_id = SCOPE_IDENTITY();";
 
             var dynamicParameters = new DynamicParameters();

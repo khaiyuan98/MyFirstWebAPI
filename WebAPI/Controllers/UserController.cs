@@ -25,8 +25,8 @@ namespace Test.WebAPI.Controllers
         [Route("register")]
         public async Task<ActionResult<int>> Register(NewUserDto request)
         {
-            int res = await _userService.RegisterAsync(request);
-            return Ok(res);
+            int? res = await _userService.RegisterAsync(request);
+            return res.HasValue ? Ok(res.Value) : Forbid("Could not add the user");
         }
 
         // GET: api/user
