@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.AccessControl;
 using Test.DataAccess.Models;
 using Test.WebAPI.Models.Auth;
 using Test.WebAPI.Models.Department;
@@ -18,10 +20,16 @@ namespace Test.WebAPI
             CreateMap<AuthUser, User>().ReverseMap();
             CreateMap<UserDto, User>().ReverseMap();
 
-            //CreateMap<ContactRequestModel, ContactModel>()
-            //    .ForPath(dest => dest.Company.id, o => o.MapFrom(c => c.company_id))
-            //    .ForPath(dest => dest.BusinessPartner.id, o => o.MapFrom(c => c.business_partner_id))
-            //    .ReverseMap();
+            CreateMap<User, UserDto>()
+                .ForMember(dest => dest.RoleName,
+                opt => opt.MapFrom((src, dest) => src.UserRole?.Description)
+                )
+                .ForMember(dest => dest.UserGroups,
+                opt => opt.MapFrom((src, dest) => src.UserGroups?.Select(x => x.Description).ToList())
+                )
+                .ForMember(dest => dest.LastUpdatedBy,
+                opt => opt.MapFrom((src, dest) => src.LastUpdatedBy?.Username)
+                );
 
             //CreateMap<ContractRequestModel, ContractModel>()
             //    .ForPath(dest => dest.Company.id, o => o.MapFrom(c => c.company_id))

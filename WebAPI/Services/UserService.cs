@@ -35,7 +35,7 @@ namespace Test.WebAPI.Services
             User user = _mapper.Map<User>(newUser);
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
-            user.LastUpdatedBy = int.Parse(userIdClaim.Value);
+            user.LastUpdatedById = int.Parse(userIdClaim.Value);
 
             int res = await _userRepository.AddUser(user);
             return res;

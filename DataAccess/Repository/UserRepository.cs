@@ -16,10 +16,35 @@ namespace Test.DataAccess.Repository
 
         public async Task<IEnumerable<User>> GetUsers()
         {
-            string query = @"SELECT * FROM dbo.Users;";
+            string userQuery = @"SELECT * FROM dbo.Users;";
+            string roleQuery = @"SELECT * FROM dbo.UserRole;";
+            string groupQuery = @"SELECT * FROM dbo.UserGroup;";
+            string userGroupMapQuery = @"SELECT * FROM dbo.User_UserGroup_Map;";
 
             using IDbConnection connection = _db.OpenConnection();
-            return await connection.QueryAsync<User>(query);
+            IEnumerable<User> users = await connection.QueryAsync<User>(userQuery);
+            IEnumerable<UserRole> userRoles = await connection.QueryAsync<UserRole>(roleQuery);
+            IEnumerable<UserGroup> userGroups = await connection.QueryAsync<UserGroup>(groupQuery);
+            IEnumerable<UserGroupMap> userGroupMaps = await connection.QueryAsync<UserGroupMap>(userGroupMapQuery);
+
+            foreach (User user in users)
+            {
+                // Get LastUpdatedBy
+                user.LastUpdatedBy = users.FirstOrDefault(person => person.UserId == user.LastUpdatedById);
+
+                // Get UserRole
+                user.UserRole = userRoles.FirstOrDefault(role => role.RoleId == user.UserRoleId);
+
+                // Get UserGroups
+                IEnumerable<int> userGroupIds = userGroupMaps
+                    .Where(map => map.UserId == user.UserId)
+                    .Select(map => map.UserGroupId);
+
+                if (userGroupIds is not null)
+                    user.UserGroups = userGroups.Where(group => userGroupIds.Contains(group.UserGroupId)).ToList();
+            }
+
+            return users;
         }
 
         public async Task<User?> GetUserByUsername(string username)
@@ -40,8 +65,8 @@ namespace Test.DataAccess.Repository
 
         public async Task<int> AddUser(User user)
         {
-            string query = @"INSERT INTO dbo.Users(Username, FirstName, LastName, RoleId, PasswordHash, PasswordSalt, LastUpdatedBy) 
-                            VALUES(@Username, @FirstName, @LastName, @PasswordHash, @PasswordSalt, @LastUpdatedBy);
+            string query = @"INSERT INTO dbo.Users(Username, FirstName, LastName, UserRoleId, PasswordHash, PasswordSalt, LastUpdatedById) 
+                            VALUES(@Username, @FirstName, @LastName, @UserRoleId, @PasswordHash, @PasswordSalt, @LastUpdatedById);
                             SELECT @user_id = SCOPE_IDENTITY();";
 
             var dynamicParameters = new DynamicParameters();
