@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using Test.DataAccess.Models;
+using Test.DataAccess.Models.Users;
 using Test.DataAccess.Repository;
 using Test.WebAPI.Models.Auth;
 
@@ -29,7 +29,7 @@ namespace Test.WebAPI.Services
 
         public async Task<AuthUser?> LoginAsync(UserLoginDto userLogin)
         {
-            User? user = await _userRepository.GetUserByUsername(userLogin.Username);
+            FullUser? user = await _userRepository.GetUserByUsername(userLogin.Username);
 
             if (user is null || user?.Username != userLogin.Username || !VerifyPasswordHash(userLogin.Password, user.PasswordHash, user.PasswordSalt))
             {
@@ -58,14 +58,14 @@ namespace Test.WebAPI.Services
             return;
         }
 
-        public async Task<User?> GetCurrentUserAsync()
+        public async Task<FullUser?> GetCurrentUserAsync()
         {
             var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
 
             if (userIdClaim is null)
                 return null;
 
-            User? user = await _userRepository.GetUserById(int.Parse(userIdClaim.Value));
+            FullUser? user = await _userRepository.GetUserById(int.Parse(userIdClaim.Value));
             return user;
         }
 
@@ -76,7 +76,7 @@ namespace Test.WebAPI.Services
             if (refreshToken is null)
                 return null;
 
-            User? user = await _userRepository.GetUserByRefreshToken(refreshToken);
+            FullUser? user = await _userRepository.GetUserByRefreshToken(refreshToken);
 
             if (user is null)
                 return null;
@@ -88,7 +88,7 @@ namespace Test.WebAPI.Services
             return authUser;
         }
 
-        private string CreateToken(User user)
+        private string CreateToken(FullUser user)
         {
             List<Claim> claims = new List<Claim>
             {

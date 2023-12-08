@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Test.DataAccess.Models;
+using Test.DataAccess.Models.Users;
 using Test.WebAPI.Models.Auth;
 using Test.WebAPI.Models.User;
 using Test.WebAPI.Services;
@@ -61,7 +61,7 @@ namespace Test.WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<CurrentUserDto>> GetCurrentUser()
         {
-            User? user = await _authService.GetCurrentUserAsync();
+            FullUser? user = await _authService.GetCurrentUserAsync();
             CurrentUserDto currentUser = _mapper.Map<CurrentUserDto>(user);
             return user is not null ? Ok(currentUser) : NotFound(currentUser);
         }

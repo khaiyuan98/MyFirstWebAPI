@@ -1,11 +1,11 @@
-﻿using Test.DataAccess.Models;
+﻿using Test.DataAccess.Models.Users;
 using Test.WebAPI.Models.Auth;
 
 namespace Test.WebAPI.Services
 {
     public interface IAuthService
     {
-        Task<User?> GetCurrentUserAsync();
+        Task<FullUser?> GetCurrentUserAsync();
         Task<AuthUser?> LoginAsync(UserLoginDto userLogin);
         Task LogoutAsync();
         Task<AuthUser?> RefreshToken();

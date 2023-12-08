@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using System.Security.AccessControl;
 using Test.DataAccess.Models;
+using Test.DataAccess.Models.Users;
 using Test.WebAPI.Models.Auth;
 using Test.WebAPI.Models.Department;
 using Test.WebAPI.Models.Employee;
@@ -15,18 +16,16 @@ namespace Test.WebAPI
         {
             CreateMap<NewDepartmentDto, Department>().ReverseMap();
             CreateMap<NewEmployeeDto, Employee>().ReverseMap();
-            CreateMap<NewUserDto, User>().ReverseMap();
-            CreateMap<CurrentUserDto, User>().ReverseMap();
-            CreateMap<AuthUser, User>().ReverseMap();
-            CreateMap<UserDto, User>().ReverseMap();
+            CreateMap<CurrentUserDto, FullUser>().ReverseMap();
+            CreateMap<AuthUser, FullUser>().ReverseMap();
 
-            CreateMap<User, UserDto>()
-                .ForMember(dest => dest.RoleName,
-                opt => opt.MapFrom((src, dest) => src.UserRole?.Description)
-                )
-                .ForMember(dest => dest.UserGroups,
-                opt => opt.MapFrom((src, dest) => src.UserGroups?.Select(x => x.Description).ToList())
-                )
+            CreateMap<User, GetUserDto>();
+            CreateMap<UserRole, UserRoleDto>();
+            CreateMap<UserGroup, UserGroupDto>();
+            CreateMap<NewUserDto, AddUser>();
+            CreateMap<UpdateUserDto, UpdateUser>();
+
+            CreateMap<FullUser, UserDetailsDto>()
                 .ForMember(dest => dest.LastUpdatedBy,
                 opt => opt.MapFrom((src, dest) => src.LastUpdatedBy?.Username)
                 );

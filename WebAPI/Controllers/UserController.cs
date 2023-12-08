@@ -21,20 +21,41 @@ namespace Test.WebAPI.Controllers
             _userService = userService;
         }
 
-        [HttpPost]
-        [Route("register")]
-        public async Task<ActionResult<int>> Register(NewUserDto request)
-        {
-            int? res = await _userService.RegisterAsync(request);
-            return res.HasValue ? Ok(res.Value) : Forbid("Could not add the user");
-        }
-
         // GET: api/user
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserDto>>> Get()
+        public async Task<ActionResult<IEnumerable<GetUserDto>>> GetUsers()
         {
-            IEnumerable<UserDto> users = await _userService.GetUsers();
-            return Ok(users);
+            IEnumerable<GetUserDto> users = await _userService.GetUsers();
+            return users is not null ? Ok(users) : NotFound("Users not found");
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ActionResult<IEnumerable<UserDetailsDto>>> GetUserById(int id)
+        {
+            UserDetailsDto? user = await _userService.GetUserById(id);
+            return user is not null ? Ok(user) : NotFound("User was not found");
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<string>> AddUser(NewUserDto request)
+        {
+           int? res = await _userService.AddUser(request);
+            return res > 0 ? Ok("Successfully added the user") : StatusCode(500, "Could not add the user");
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<string>> UpdateUser(UpdateUserDto request)
+        {
+            int? res = await _userService.UpdateUser(request);
+            return res > 0 ? Ok("Successfully updated the user") : StatusCode(500, "Could not update the user");
+        }
+
+        [HttpDelete("{UserId}")]
+        public async Task<ActionResult<string>> DeleteUser(int UserId)
+        {
+            int res = await _userService.DeleteUser(UserId);
+            return res > 0 ? Ok("Successfully deleted the user") : StatusCode(500, "Could not delete the user");
         }
 
     }

@@ -4,7 +4,10 @@ namespace Test.WebAPI.Services
 {
     public interface IUserService
     {
-        Task<IEnumerable<UserDto>> GetUsers();
-        Task<int?> RegisterAsync(NewUserDto newUser);
+        Task<int> DeleteUser(int UserId);
+        Task<IEnumerable<GetUserDto>> GetUsers();
+        Task<int?> AddUser(NewUserDto newUser);
+        Task<UserDetailsDto?> GetUserById(int id);
+        Task<int?> UpdateUser(UpdateUserDto updatedUser);
     }
 }
